@@ -1,0 +1,41 @@
+<!-- book-preview.html -->
+<template id="book-preview-template">
+    <style>
+        /* Styles for the book preview component */
+    </style>
+    <div class="book-preview">
+        <div class="book-title"></div>
+        <div class="book-author"></div>
+        <div class="book-description"></div>
+    </div>
+</template>
+
+<script>
+    class BookPreview extends HTMLElement {
+        constructor() {
+            super();
+            this.attachShadow({ mode: 'open' });
+            const template = document.getElementById('book-preview-template');
+            this.shadowRoot.appendChild(template.content.cloneNode(true));
+        }
+
+        connectedCallback() {
+            this.fetchBookData();
+        }
+
+        async fetchBookData() {
+            const bookId = this.getAttribute('book-id');
+            const response = await fetch(`/api/books/${bookId}`);
+            const data = await response.json();
+            this.render(data);
+        }
+
+        render(data) {
+            this.shadowRoot.querySelector('.book-title').textContent = data.title;
+            this.shadowRoot.querySelector('.book-author').textContent = `by ${data.author}`;
+            this.shadowRoot.querySelector('.book-description').textContent = data.description;
+        }
+    }
+
+    customElements.define('book-preview', BookPreview);
+</script>
